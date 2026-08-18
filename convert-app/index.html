@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ממיר טיול | ₪ ₾ $</title>
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ממיר טיול">
+<style>
+  :root{
+    --bg:#0f172a;
+    --bg-card:#16213a;
+    --bg-card2:#1c2947;
+    --accent:#0ea5b7;
+    --accent2:#e11d48;
+    --text:#f1f5f9;
+    --text-dim:#94a3b8;
+    --green:#22c55e;
+    --orange:#f59e0b;
+    --red:#ef4444;
+    --border:#28375a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:linear-gradient(180deg,#0f172a 0%,#101a30 100%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header.app-header{
+    position:sticky; top:0; z-index:20;
+    background:rgba(15,23,42,0.95);
+    backdrop-filter:blur(6px);
+    padding:14px 16px 0 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .title-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .title-row h1{font-size:19px; margin:0; display:flex; align-items:center; gap:8px;}
+  .tabs{display:flex; gap:6px; padding-bottom:0;}
+  .tab-btn{
+    flex:1; background:none; border:none; color:var(--text-dim);
+    padding:10px 4px 12px 4px; font-size:14px; font-weight:600;
+    border-bottom:3px solid transparent; cursor:pointer;
+  }
+  .tab-btn.active{color:var(--text); border-bottom-color:var(--accent);}
+  main{padding:16px; max-width:520px; margin:0 auto;}
+  .card{
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--radius); padding:16px; margin-bottom:14px;
+  }
+  .card h2{font-size:15px; margin:0 0 12px 0; color:var(--text-dim); font-weight:700;}
+  .row{display:flex; gap:10px;}
+  input[type=number], input[type=text], input[type=date], select{
+    width:100%; background:var(--bg-card2); border:1px solid var(--border);
+    color:var(--text); border-radius:10px; padding:11px 12px; font-size:16px;
+    outline:none;
+  }
+  select{appearance:none;}
+  label.small{font-size:12px; color:var(--text-dim); display:block; margin-bottom:5px;}
+  button{font-family:inherit; cursor:pointer;}
+  .amount-input{font-size:28px; font-weight:700; text-align:center; padding:14px;}
+  .currency-select-wrap{margin-top:8px;}
+  .convert-result{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--bg-card2); border-radius:12px; padding:14px 16px; margin-bottom:10px;
+  }
+  .convert-result .cur{font-size:13px; color:var(--text-dim);}
+  .convert-result .val{font-size:22px; font-weight:700;}
+  .rate-line{font-size:12px; color:var(--text-dim); margin-top:6px; display:flex; justify-content:space-between; align-items:center;}
+  .link-btn{background:none; border:none; color:var(--accent); font-size:13px; font-weight:600; padding:4px;}
+  .btn-primary{
+    width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px;
+    padding:13px; font-size:15px; font-weight:700; margin-top:6px;
+  }
+  .btn-secondary{
+    width:100%; background:var(--bg-card2); color:var(--text); border:1px solid var(--border);
+    border-radius:12px; padding:12px; font-size:14px; font-weight:600; margin-top:8px;
+  }
+  .rates-edit{display:none; margin-top:12px; border-top:1px solid var(--border); padding-top:12px;}
+  .rates-edit.open{display:block;}
+  .rate-field{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .rate-field span{width:70px; font-size:13px; color:var(--text-dim);}
+
+  /* Summary cards row (expenses tab) */
+  .stats-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px;}
+  .stat-box{background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center;}
+  .stat-box .lbl{font-size:11px; color:var(--text-dim); margin-bottom:4px;}
+  .stat-box .num{font-size:15px; font-weight:700;}
+
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:12px;}
+  .cat-btn{
+    background:var(--bg-card2); border:2px solid transparent; border-radius:12px;
+    padding:10px 4px; text-align:center; color:var(--text); font-size:11px;
+  }
+  .cat-btn .icon{font-size:22px; display:block; margin-bottom:4px;}
+  .cat-btn.selected{border-color:var(--accent); background:#0ea5b722;}
+
+  .filters{display:flex; gap:6px; margin-bottom:12px;}
+  .filter-btn{
+    flex:1; background:var(--bg-card2); border:1px solid var(--border); color:var(--text-dim);
+    border-radius:10px; padding:8px; font-size:13px; font-weight:600;
+  }
+  .filter-btn.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+
+  .expense-item{
+    display:flex; align-items:center; gap:10px; padding:12px 6px; border-bottom:1px solid var(--border);
+  }
+  .expense-item:last-child{border-bottom:none;}
+  .expense-item .ic{font-size:24px; width:34px; text-align:center;}
+  .expense-item .info{flex:1; min-width:0;}
+  .expense-item .info .note{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .expense-item .info .meta{font-size:12px; color:var(--text-dim);}
+  .expense-item .amt{text-align:left; font-weight:700; font-size:15px;}
+  .expense-item .amt .ils{font-size:11px; color:var(--text-dim); font-weight:400;}
+  .del-btn{background:none; border:none; font-size:17px; opacity:0.6; padding:6px;}
+  .empty-state{text-align:center; padding:30px 10px; color:var(--text-dim); font-size:14px;}
+
+  /* Budget */
+  .progress-outer{background:var(--bg-card2); border-radius:10px; height:14px; overflow:hidden; margin:10px 0;}
+  .progress-inner{height:100%; background:var(--green); transition:width .3s;}
+  .progress-inner.orange{background:var(--orange);}
+  .progress-inner.red{background:var(--red);}
+  .budget-numbers{display:flex; justify-content:space-between; font-size:13px; color:var(--text-dim);}
+  .warn-box{background:#7f1d1d33; border:1px solid var(--red); color:#fca5a5; border-radius:10px; padding:10px; font-size:13px; margin-top:8px;}
+
+  .cat-bar-row{margin-bottom:12px;}
+  .cat-bar-row .top-line{display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;}
+  .cat-bar-outer{background:var(--bg-card2); border-radius:8px; height:10px; overflow:hidden;}
+  .cat-bar-inner{height:100%; background:var(--accent);}
+
+  footer.tabbar{display:none;}
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:#111827; color:#fff; padding:10px 18px; border-radius:30px; font-size:13px;
+    box-shadow:0 4px 14px rgba(0,0,0,.4); z-index:50; opacity:0; pointer-events:none; transition:opacity .25s;
+  }
+  .toast.show{opacity:1;}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:60;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-sheet{
+    background:var(--bg-card); border-radius:20px 20px 0 0; padding:20px 16px calc(20px + env(safe-area-inset-bottom));
+    width:100%; max-width:520px; max-height:80vh; overflow-y:auto;
+  }
+  .modal-sheet h3{margin-top:0;}
+  .hint{font-size:12px; color:var(--text-dim); line-height:1.6;}
+  a.export-link{color:var(--accent); text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="title-row">
+    <h1>🇬🇪 ממיר טיול</h1>
+    <span style="font-size:12px;color:var(--text-dim);" id="lastRateUpdate"></span>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="convert">💱 ממיר</button>
+    <button class="tab-btn" data-tab="expenses">💰 הוצאות</button>
+    <button class="tab-btn" data-tab="summary">📊 סיכום</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== TAB: CONVERTER ===== -->
+  <section id="tab-convert" class="tab-panel">
+    <div class="card">
+      <h2>סכום להמרה</h2>
+      <input type="number" inputmode="decimal" id="convAmount" class="amount-input" value="100" min="0" step="any">
+      <div class="currency-select-wrap">
+        <label class="small">ממטבע</label>
+        <select id="convFrom">
+          <option value="ILS">₪ שקל (ILS)</option>
+          <option value="USD">$ דולר (USD)</option>
+          <option value="GEL">₾ לארי (GEL)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>תוצאה</h2>
+      <div id="convResults"></div>
+      <div class="rate-line">
+        <span id="rateInfoLine"></span>
+        <button class="link-btn" id="toggleRatesEdit">✏️ ערוך שערים</button>
+      </div>
+      <div class="rates-edit" id="ratesEditPanel">
+        <div class="rate-field"><span>USD → ₪</span><input type="number" step="any" id="rateUSD"></div>
+        <div class="rate-field"><span>GEL → ₪</span><input type="number" step="any" id="rateGEL"></div>
+        <button class="btn-secondary" id="saveRatesBtn">💾 שמור שערים</button>
+        <button class="btn-secondary" id="fetchRatesBtn">🔄 עדכן שערים אוטומטית (דורש אינטרנט)</button>
+      </div>
+      <button class="btn-primary" id="saveAsExpenseBtn">➕ שמור את הסכום הזה כהוצאה</button>
+    </div>
+  </section>
+
+  <!-- ===== TAB: EXPENSES ===== -->
+  <section id="tab-expenses" class="tab-panel" style="display:none;">
+    <div class="stats-grid">
+      <div class="stat-box"><div class="lbl">סה"כ טיול (₪)</div><div class="num" id="statTotalILS">0</div></div>
+      <div class="stat-box"><div class="lbl">היום</div><div class="num" id="statToday">0</div></div>
+      <div class="stat-box"><div class="lbl">רישומים</div><div class="num" id="statCount">0</div></div>
+    </div>
+
+    <div class="card">
+      <h2>הוספת הוצאה</h2>
+      <div class="cat-grid" id="catGrid"></div>
+      <div class="row">
+        <div style="flex:1;">
+          <label class="small">סכום</label>
+          <input type="number" inputmode="decimal" id="expAmount" placeholder="0">
+        </div>
+        <div style="width:110px;">
+          <label class="small">מטבע</label>
+          <select id="expCurrency">
+            <option value="GEL">₾ GEL</option>
+            <option value="ILS">₪ ILS</option>
+            <option value="USD">$ USD</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <label class="small">הערה (אופציונלי)</label>
+        <input type="text" id="expNote" placeholder="לדוגמה: חצ'פורי בטביליסי">
+      </div>
+      <button class="btn-primary" id="addExpenseBtn">➕ הוסף הוצאה</button>
+    </div>
+
+    <div class="card" style="padding-bottom:6px;">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">הכל</button>
+        <button class="filter-btn" data-filter="today">היום</button>
+        <button class="filter-btn" data-filter="7days">7 ימים אחרונים</button>
+      </div>
+      <div id="expenseList"></div>
+    </div>
+  </section>
+
+  <!-- ===== TAB: SUMMARY ===== -->
+  <section id="tab-summary" class="tab-panel" style="display:none;">
+
+    <div class="card">
+      <h2>💰 מעקב תקציב</h2>
+      <div class="row">
+        <div style="flex:1;">
+          <label class="small">סכום תקציב</label>
+          <input type="number" id="budgetAmount" placeholder="לדוגמה 5000">
+        </div>
+        <div style="width:110px;">
+          <label class="small">מטבע</label>
+          <select id="budgetCurrency">
+            <option value="ILS">₪ ILS</option>
+            <option value="USD">$ USD</option>
+            <option value="GEL">₾ GEL</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-secondary" id="saveBudgetBtn">💾 שמור תקציב</button>
+      <div id="budgetDisplay"></div>
+    </div>
+
+    <div class="card">
+      <h2>📅 סטטיסטיקת טיול</h2>
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="stat-box"><div class="lbl">ימי טיול</div><div class="num" id="statDays">0</div></div>
+        <div class="stat-box"><div class="lbl">ממוצע יומי (₪)</div><div class="num" id="statDailyAvg">0</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🍕 פילוח לפי קטגוריות</h2>
+      <div id="categoryBreakdown"></div>
+    </div>
+
+    <div class="card">
+      <h2>ניהול נתונים</h2>
+      <button class="btn-secondary" id="exportCsvBtn">📤 ייצוא CSV (אקסל)</button>
+      <button class="btn-secondary" id="backupJsonBtn">💾 גיבוי JSON</button>
+      <button class="btn-secondary" id="restoreJsonBtn">📥 שחזור מגיבוי JSON</button>
+      <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+      <button class="btn-secondary" id="clearAllBtn" style="color:var(--red);">🗑️ מחיקת כל הנתונים</button>
+    </div>
+
+    <div class="hint">
+      המידע נשמר במכשיר שלך בלבד — פרטיות מלאה, גם ללא אינטרנט.<br>
+      מומלץ לגבות JSON מדי פעם, ולפני מעבר מכשיר.
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-sheet">
+    <h3 id="confirmTitle">אישור</h3>
+    <p id="confirmText" class="hint"></p>
+    <button class="btn-primary" id="confirmYes" style="background:var(--red);">כן, מחק</button>
+    <button class="btn-secondary" id="confirmNo">ביטול</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORAGE_KEY = "travelConvertApp_v1";
+  const CATEGORIES = [
+    {key:"food", label:"אוכל", icon:"🍽️"},
+    {key:"stay", label:"לינה", icon:"🏨"},
+    {key:"transport", label:"תחבורה", icon:"🚕"},
+    {key:"attraction", label:"אטרקציה", icon:"🎟️"},
+    {key:"shopping", label:"קניות", icon:"🛍️"},
+    {key:"coffee", label:"קפה/בר", icon:"☕"},
+    {key:"grocery", label:"מכולת", icon:"🛒"},
+    {key:"other", label:"אחר", icon:"💼"}
+  ];
+  const CUR_LABEL = {ILS:"₪", USD:"$", GEL:"₾"};
+
+  function defaultState(){
+    return {
+      rates: { USD: 3.7, GEL: 1.35 }, // ILS per 1 unit of currency
+      ratesUpdated: null,
+      expenses: [], // {id, dateISO, category, amount, currency, note, ilsEquivalent}
+      budget: null  // {amount, currency, ilsEquivalent}
+    };
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      return Object.assign(defaultState(), parsed, {
+        rates: Object.assign(defaultState().rates, parsed.rates || {})
+      });
+    }catch(e){
+      return defaultState();
+    }
+  }
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  let state = loadState();
+  let selectedCategory = "food";
+  let currentFilter = "all";
+
+  // ---------- helpers ----------
+  function toILS(amount, currency){
+    if(currency === "ILS") return amount;
+    return amount * state.rates[currency];
+  }
+  function fromILS(amountILS, currency){
+    if(currency === "ILS") return amountILS;
+    return amountILS / state.rates[currency];
+  }
+  function fmt(n){
+    if(!isFinite(n)) return "0";
+    return n.toLocaleString("he-IL", {maximumFractionDigits:2});
+  }
+  function todayISO(){
+    return new Date().toISOString().slice(0,10);
+  }
+  function showToast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 1800);
+  }
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> switchTab(btn.dataset.tab));
+  });
+  function switchTab(tab){
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+    document.querySelectorAll(".tab-panel").forEach(p=>{
+      p.style.display = (p.id === "tab-"+tab) ? "" : "none";
+    });
+    if(tab === "expenses") renderExpensesTab();
+    if(tab === "summary") renderSummaryTab();
+  }
+
+  // ---------- CONVERTER ----------
+  const convAmount = document.getElementById("convAmount");
+  const convFrom = document.getElementById("convFrom");
+  const convResults = document.getElementById("convResults");
+  const rateInfoLine = document.getElementById("rateInfoLine");
+  const lastRateUpdate = document.getElementById("lastRateUpdate");
+
+  function renderConverter(){
+    const amt = parseFloat(convAmount.value) || 0;
+    const from = convFrom.value;
+    const ils = toILS(amt, from);
+    const others = ["ILS","USD","GEL"].filter(c=>c!==from);
+    convResults.innerHTML = others.map(c=>{
+      const val = fromILS(ils, c);
+      return `<div class="convert-result">
+        <span class="cur">${CUR_LABEL[c]} ${c}</span>
+        <span class="val">${CUR_LABEL[c]} ${fmt(val)}</span>
+      </div>`;
+    }).join("");
+    rateInfoLine.textContent = `1$ = ${fmt(state.rates.USD)}₪ | 1₾ = ${fmt(state.rates.GEL)}₪`;
+    lastRateUpdate.textContent = state.ratesUpdated ? ("שערים עודכנו: " + new Date(state.ratesUpdated).toLocaleDateString("he-IL")) : "";
+    document.getElementById("rateUSD").value = state.rates.USD;
+    document.getElementById("rateGEL").value = state.rates.GEL;
+  }
+  convAmount.addEventListener("input", renderConverter);
+  convFrom.addEventListener("change", renderConverter);
+
+  document.getElementById("toggleRatesEdit").addEventListener("click", ()=>{
+    document.getElementById("ratesEditPanel").classList.toggle("open");
+  });
+  document.getElementById("saveRatesBtn").addEventListener("click", ()=>{
+    const u = parseFloat(document.getElementById("rateUSD").value);
+    const g = parseFloat(document.getElementById("rateGEL").value);
+    if(u>0) state.rates.USD = u;
+    if(g>0) state.rates.GEL = g;
+    state.ratesUpdated = new Date().toISOString();
+    saveState();
+    renderConverter();
+    showToast("השערים נשמרו ✔️");
+  });
+  document.getElementById("fetchRatesBtn").addEventListener("click", async ()=>{
+    showToast("מעדכן שערים...");
+    try{
+      const res = await fetch("https://open.er-api.com/v6/latest/ILS");
+      const data = await res.json();
+      if(data && data.rates && data.rates.USD && data.rates.GEL){
+        // API gives: 1 ILS = X USD  -> we need 1 USD = ? ILS => 1/X
+        state.rates.USD = 1/data.rates.USD;
+        state.rates.GEL = 1/data.rates.GEL;
+        state.ratesUpdated = new Date().toISOString();
+        saveState();
+        renderConverter();
+        showToast("השערים עודכנו אוטומטית ✔️");
+      }else{
+        showToast("לא ניתן לעדכן כרגע — נסה שוב מאוחר יותר");
+      }
+    }catch(e){
+      showToast("אין חיבור לאינטרנט — עדכן שערים ידנית");
+    }
+  });
+
+  document.getElementById("saveAsExpenseBtn").addEventListener("click", ()=>{
+    const amt = parseFloat(convAmount.value) || 0;
+    if(amt <= 0){ showToast("הזן סכום תקין"); return; }
+    document.getElementById("expAmount").value = amt;
+    document.getElementById("expCurrency").value = convFrom.value;
+    switchTab("expenses");
+    document.getElementById("expNote").focus();
+    showToast("הסכום הועבר לפנקס ההוצאות — בחר קטגוריה ולחץ הוסף");
+  });
+
+  // ---------- EXPENSES ----------
+  const catGrid = document.getElementById("catGrid");
+  catGrid.innerHTML = CATEGORIES.map(c=>`
+    <button class="cat-btn ${c.key==='food'?'selected':''}" data-cat="${c.key}">
+      <span class="icon">${c.icon}</span>${c.label}
+    </button>`).join("");
+  catGrid.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".cat-btn");
+    if(!btn) return;
+    selectedCategory = btn.dataset.cat;
+    catGrid.querySelectorAll(".cat-btn").forEach(b=>b.classList.toggle("selected", b===btn));
+  });
+
+  document.getElementById("addExpenseBtn").addEventListener("click", ()=>{
+    const amount = parseFloat(document.getElementById("expAmount").value);
+    const currency = document.getElementById("expCurrency").value;
+    const note = document.getElementById("expNote").value.trim();
+    if(!amount || amount <= 0){ showToast("הזן סכום תקין"); return; }
+    const ilsEquivalent = toILS(amount, currency);
+    state.expenses.push({
+      id: uid(),
+      dateISO: new Date().toISOString(),
+      category: selectedCategory,
+      amount, currency, note,
+      ilsEquivalent
+    });
+    saveState();
+    document.getElementById("expAmount").value = "";
+    document.getElementById("expNote").value = "";
+    showToast("ההוצאה נשמרה ✔️");
+    renderExpensesTab();
+  });
+
+  document.querySelectorAll(".filter-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active", b===btn));
+      renderExpensesTab();
+    });
+  });
+
+  function filteredExpenses(){
+    const now = new Date();
+    return state.expenses.filter(ex=>{
+      const d = new Date(ex.dateISO);
+      if(currentFilter === "today"){
+        return d.toDateString() === now.toDateString();
+      }
+      if(currentFilter === "7days"){
+        const diff = (now - d) / 86400000;
+        return diff <= 7;
+      }
+      return true;
+    }).sort((a,b)=> new Date(b.dateISO) - new Date(a.dateISO));
+  }
+
+  function renderExpensesTab(){
+    const totalILS = state.expenses.reduce((s,e)=>s+e.ilsEquivalent,0);
+    const today = state.expenses.filter(e=> new Date(e.dateISO).toDateString() === new Date().toDateString())
+                                 .reduce((s,e)=>s+e.ilsEquivalent,0);
+    document.getElementById("statTotalILS").textContent = "₪" + fmt(totalILS);
+    document.getElementById("statToday").textContent = "₪" + fmt(today);
+    document.getElementById("statCount").textContent = state.expenses.length;
+
+    const list = filteredExpenses();
+    const listEl = document.getElementById("expenseList");
+    if(list.length === 0){
+      listEl.innerHTML = `<div class="empty-state">אין רישומים להצגה בסינון הנוכחי</div>`;
+      return;
+    }
+    listEl.innerHTML = list.map(ex=>{
+      const cat = CATEGORIES.find(c=>c.key===ex.category) || CATEGORIES[CATEGORIES.length-1];
+      const d = new Date(ex.dateISO);
+      const dateStr = d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+      const showIlsHint = ex.currency !== "ILS";
+      return `<div class="expense-item">
+        <div class="ic">${cat.icon}</div>
+        <div class="info">
+          <div class="note">${ex.note ? ex.note : cat.label}</div>
+          <div class="meta">${cat.label} · ${dateStr}</div>
+        </div>
+        <div class="amt">
+          ${CUR_LABEL[ex.currency]}${fmt(ex.amount)}
+          ${showIlsHint ? `<div class="ils">≈ ₪${fmt(ex.ilsEquivalent)}</div>` : ``}
+        </div>
+        <button class="del-btn" data-id="${ex.id}">🗑️</button>
+      </div>`;
+    }).join("");
+    listEl.querySelectorAll(".del-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        state.expenses = state.expenses.filter(e=>e.id !== btn.dataset.id);
+        saveState();
+        renderExpensesTab();
+        renderSummaryTab();
+        showToast("נמחק");
+      });
+    });
+  }
+
+  // ---------- SUMMARY ----------
+  function renderSummaryTab(){
+    renderBudget();
+    renderTripStats();
+    renderCategoryBreakdown();
+  }
+
+  function renderBudget(){
+    const disp = document.getElementById("budgetDisplay");
+    if(state.budget){
+      document.getElementById("budgetAmount").value = state.budget.amount;
+      document.getElementById("budgetCurrency").value = state.budget.currency;
+      const totalILS = state.expenses.reduce((s,e)=>s+e.ilsEquivalent,0);
+      const pct = Math.min(100, (totalILS / state.budget.ilsEquivalent) * 100);
+      const over = totalILS > state.budget.ilsEquivalent;
+      const remainingILS = state.budget.ilsEquivalent - totalILS;
+      let cls = "green";
+      if(pct >= 100) cls = "red"; else if(pct >= 80) cls = "orange";
+      disp.innerHTML = `
+        <div class="progress-outer"><div class="progress-inner ${cls}" style="width:${Math.min(pct,100)}%"></div></div>
+        <div class="budget-numbers">
+          <span>${fmt(pct)}% נוצל</span>
+          <span>${remainingILS>=0 ? "נותרו ₪"+fmt(remainingILS) : "חריגה ₪"+fmt(-remainingILS)}</span>
+        </div>
+        ${over ? `<div class="warn-box">⚠️ חרגת מהתקציב שהגדרת!</div>` : ``}
+      `;
+    }else{
+      disp.innerHTML = `<div class="hint">לא הוגדר תקציב עדיין.</div>`;
+    }
+  }
+  document.getElementById("saveBudgetBtn").addEventListener("click", ()=>{
+    const amount = parseFloat(document.getElementById("budgetAmount").value);
+    const currency = document.getElementById("budgetCurrency").value;
+    if(!amount || amount<=0){ showToast("הזן סכום תקציב תקין"); return; }
+    state.budget = { amount, currency, ilsEquivalent: toILS(amount, currency) };
+    saveState();
+    renderBudget();
+    showToast("התקציב נשמר ✔️");
+  });
+
+  function renderTripStats(){
+    const totalILS = state.expenses.reduce((s,e)=>s+e.ilsEquivalent,0);
+    let days = 1;
+    if(state.expenses.length > 0){
+      const dates = state.expenses.map(e=> new Date(e.dateISO).setHours(0,0,0,0));
+      const min = Math.min(...dates), max = Math.max(...dates, new Date().setHours(0,0,0,0));
+      days = Math.max(1, Math.round((max-min)/86400000) + 1);
+    }
+    document.getElementById("statDays").textContent = days;
+    document.getElementById("statDailyAvg").textContent = "₪" + fmt(totalILS/days);
+  }
+
+  function renderCategoryBreakdown(){
+    const totalILS = state.expenses.reduce((s,e)=>s+e.ilsEquivalent,0);
+    const el = document.getElementById("categoryBreakdown");
+    if(totalILS <= 0){
+      el.innerHTML = `<div class="hint">עדיין אין הוצאות לפילוח.</div>`;
+      return;
+    }
+    const sums = {};
+    CATEGORIES.forEach(c=> sums[c.key]=0);
+    state.expenses.forEach(e=> sums[e.category] = (sums[e.category]||0) + e.ilsEquivalent);
+    const rows = CATEGORIES.map(c=>({...c, sum:sums[c.key]}))
+      .filter(c=>c.sum>0)
+      .sort((a,b)=>b.sum-a.sum);
+    el.innerHTML = rows.map(c=>{
+      const pct = (c.sum/totalILS)*100;
+      return `<div class="cat-bar-row">
+        <div class="top-line"><span>${c.icon} ${c.label}</span><span>₪${fmt(c.sum)} (${fmt(pct)}%)</span></div>
+        <div class="cat-bar-outer"><div class="cat-bar-inner" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join("");
+  }
+
+  // ---------- EXPORT / BACKUP / RESTORE / CLEAR ----------
+  function downloadBlob(content, filename, type){
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 300);
+  }
+
+  document.getElementById("exportCsvBtn").addEventListener("click", ()=>{
+    if(state.expenses.length === 0){ showToast("אין הוצאות לייצוא"); return; }
+    const header = ["תאריך","קטגוריה","סכום","מטבע","שווי בשקלים","הערה"];
+    const rows = state.expenses.slice().sort((a,b)=>new Date(a.dateISO)-new Date(b.dateISO)).map(e=>{
+      const cat = CATEGORIES.find(c=>c.key===e.category);
+      const d = new Date(e.dateISO);
+      return [
+        d.toLocaleDateString("he-IL")+" "+d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"}),
+        cat ? cat.label : e.category,
+        e.amount, e.currency, e.ilsEquivalent.toFixed(2),
+        (e.note||"").replace(/"/g,'""')
+      ];
+    });
+    const csv = "﻿" + [header, ...rows].map(r=>r.map(v=>`"${v}"`).join(",")).join("\r\n");
+    downloadBlob(csv, "הוצאות-טיול.csv", "text/csv;charset=utf-8;");
+    showToast("קובץ CSV ירד ✔️");
+  });
+
+  document.getElementById("backupJsonBtn").addEventListener("click", ()=>{
+    downloadBlob(JSON.stringify(state, null, 2), "גיבוי-ממיר-טיול.json", "application/json");
+    showToast("גיבוי JSON ירד ✔️");
+  });
+
+  document.getElementById("restoreJsonBtn").addEventListener("click", ()=>{
+    document.getElementById("restoreFileInput").click();
+  });
+  document.getElementById("restoreFileInput").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const data = JSON.parse(reader.result);
+        state = Object.assign(defaultState(), data, {
+          rates: Object.assign(defaultState().rates, data.rates || {})
+        });
+        saveState();
+        renderConverter(); renderExpensesTab(); renderSummaryTab();
+        showToast("השחזור הושלם ✔️");
+      }catch(err){
+        showToast("קובץ לא תקין");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  // confirm modal (used for clear-all double confirm)
+  const confirmModal = document.getElementById("confirmModal");
+  function askConfirm(title, text){
+    return new Promise(resolve=>{
+      document.getElementById("confirmTitle").textContent = title;
+      document.getElementById("confirmText").textContent = text;
+      confirmModal.classList.add("open");
+      const yes = document.getElementById("confirmYes");
+      const no = document.getElementById("confirmNo");
+      function cleanup(v){
+        confirmModal.classList.remove("open");
+        yes.removeEventListener("click", onYes);
+        no.removeEventListener("click", onNo);
+        resolve(v);
+      }
+      function onYes(){ cleanup(true); }
+      function onNo(){ cleanup(false); }
+      yes.addEventListener("click", onYes);
+      no.addEventListener("click", onNo);
+    });
+  }
+
+  document.getElementById("clearAllBtn").addEventListener("click", async ()=>{
+    const ok1 = await askConfirm("מחיקת כל הנתונים", "פעולה זו תמחק את כל ההוצאות, התקציב והשערים השמורים. האם להמשיך?");
+    if(!ok1) return;
+    const ok2 = await askConfirm("אישור אחרון", "בטוח לגמרי? לא ניתן לשחזר לאחר המחיקה (אלא אם יש לך גיבוי JSON).");
+    if(!ok2) return;
+    state = defaultState();
+    saveState();
+    renderConverter(); renderExpensesTab(); renderSummaryTab();
+    showToast("כל הנתונים נמחקו");
+  });
+
+  // ---------- init ----------
+  renderConverter();
+  renderExpensesTab();
+  renderSummaryTab();
+
+  // register service worker for offline home-screen use (optional, best-effort)
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
